@@ -2,7 +2,7 @@
 
 all: compile
 
-compile: rebar
+compile: 
 	./rebar get-deps compile
 
 test: rebar compile
@@ -11,6 +11,6 @@ test: rebar compile
 clean: rebar
 	./rebar clean
 
-rebar:
-	wget http://cloud.github.com/downloads/basho/rebar/rebar
-	chmod u+x rebar
+#rebar:
+#	wget http://cloud.github.com/downloads/basho/rebar/rebar
+#	chmod u+x rebar
