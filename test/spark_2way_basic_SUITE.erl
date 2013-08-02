@@ -55,6 +55,21 @@ init_per_testcase(CaseName, Config) ->
 end_per_testcase(CaseName, Config) ->
     escalus:end_per_testcase(CaseName, Config).
 
+
+
+ensure_dependency()->
+    Apps = [
+	    inets,
+	    crypto, 
+            public_key,
+            ssl,
+	    restc, 
+            ets ],
+    app_util:start_apps(Apps),    
+    ok.
+
+
+
 %%--------------------------------------------------------------------
 %% Message tests
 %%--------------------------------------------------------------------
