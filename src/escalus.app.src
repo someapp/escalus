@@ -7,7 +7,7 @@
                   kernel,
                   stdlib
                  ]},
-
+  
   {mod, { escalus_app, []}},
   {env, []}
  ]}.

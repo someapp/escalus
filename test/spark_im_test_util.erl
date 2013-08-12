@@ -7,12 +7,21 @@
 
 create_password(Config)->
   Jid = escalus_config:get_config(username, Config),
-  Url = access_token_urls(Config),
-  BrandId = lookup_brandid(Jid),
   Email = escalus_config:get_config(email, Config),
   AppId = escalus_config:get_config(app_id, Config),
   Password = escalus_config:get_config(login_password, Config),
   ClientSecret = escalus_config:get_config(client_secret, Config),
+ 
+  Url = access_token_urls(Config),
+  BrandId = lookup_brandid(Jid),
+  print_config(Jid, 
+			 Url,
+ 			 AppId,
+			 BrandId,
+			 Email,
+			 Password,
+			 ClientSecret),
+			 
   get_access_token_url_for(Jid, 
 			 Url,
  			 AppId,
@@ -116,6 +125,22 @@ split_composite_id(UserName)->
    end.
 
 
+print_config(Jid, 
+			 Url,
+ 			 AppId,
+			 BrandId,
+			 Email,
+			 Password,
+			 ClientSecret) ->
+  error_logger:info_msg("Jid: ~p ~n",[Jid]),			 
+  error_logger:info_msg("Url: ~p ~n",[Url]),			 
+  error_logger:info_msg("AppId: ~p ~n",[AppId]),			 
+  error_logger:info_msg("BrandId: ~p ~n",[BrandId]),
+  error_logger:info_msg("Password: ~p ~n",[Password]),			 
+  error_logger:info_msg("ClientSecret: ~p ~n",[ClientSecret]).			 
+			 
+ 			 
+		
 
 
 

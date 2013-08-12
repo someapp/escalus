@@ -58,8 +58,10 @@ create_users(Config) ->
     create_users(Config, all).
 
 create_users(Config, Who) ->
-    Users = get_users(Who),
+    error_logger:info_msg("Create Users: ~p ~n",[Who]),
     
+    Users = get_users(Who),
+   
     
     CreationResults = [create_user(Config, User) || User <- Users],
     lists:foreach(fun verify_creation/1, CreationResults),
@@ -166,7 +168,10 @@ get_user_by_name(Name) ->
     get_user_by_name(Name, get_users(all)).
 
 create_user(Config, {_Name, UserSpec}) ->
-    Options0 = get_options(Config, UserSpec),
+    Options0 = get_options(Config, UserSpec),  
+    io:format("Config ~s~n",[Config]),
+    io:format("UserSpec ~s~n",[UserSpec]),
+       
     {ok, Conn, Options1} = escalus_connection:connect(Options0),
     escalus_session:start_stream(Conn, Options1),
     escalus_connection:send(Conn, escalus_stanza:get_registration_fields()),
