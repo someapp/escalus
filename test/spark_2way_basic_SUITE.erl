@@ -74,9 +74,9 @@ ensure_dependency()->
 %%--------------------------------------------------------------------
 
 messages_story(Config) ->
-    escalus:story(Config, [1, 1], fun(Alice, Bob) ->
+    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
 
-        %% Alice sends a message to Bob
+        %% AllAccess Send to NonSub
         escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
 
         %% Bob gets the message
