@@ -171,7 +171,7 @@ messages_story(Config) ->
 nonsub2sub_2way_should_block_pass_story(Config) ->
 messages_story(Config) ->
     escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
-
+        
         %% AllAccess Send to NonSub
         escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
 
