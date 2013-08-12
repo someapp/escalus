@@ -47,21 +47,27 @@ suite() ->
 %%--------------------------------------------------------------------
 
 init_per_suite(Config) ->
+	error_logger:info_msg("Init Test Suite with Config ~p",[Config]),
     escalus:init_per_suite(Config).
 
 end_per_suite(Config) ->
+	error_logger:info_msg("End Test Suite with Config ~p",[Config]),
     escalus:end_per_suite(Config).
 
-init_per_group(_GroupName, Config) ->
+init_per_group(GroupName, Config) ->
+	error_logger:info_msg("Init Test Group ~p with Config ~p",[GroupName, Config]),
     escalus:create_users(Config).
 
-end_per_group(_GroupName, Config) ->
+end_per_group(GroupName, Config) ->
+	error_logger:info_msg("End Test Group ~p with Config ~p",[GroupName, Config]),
     escalus:delete_users(Config).
 
 init_per_testcase(CaseName, Config) ->
+	error_logger:info_msg("Init Test Case ~p with Config ~p",[CaseName, Config]),
     escalus:init_per_testcase(CaseName, Config).
 
 end_per_testcase(CaseName, Config) ->
+	error_logger:info_msg("End Test Case ~p with Config ~p",[CaseName, Config]),
     escalus:end_per_testcase(CaseName, Config).
 
 ensure_dependency()->
