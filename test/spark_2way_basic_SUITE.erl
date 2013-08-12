@@ -28,7 +28,16 @@ all() ->
     [{group, messages}].
 
 groups() ->
-    [{messages, [sequence], [messages_story]}].
+    [{messages, [sequence], 
+     [aa2aa_2way_should_pass_story,
+      aa2sub_2way_should_pass_story,
+      aa2nonsub_2way_should_pass_story,
+      sub2sub_2way_should_pass_story,
+      sub2nonsub_2way_should_block_pass_story,
+      nonsub2non_2way_should_block_pass_story,
+      nonsub2sub_2way_should_block_pass_story,
+      nonsub2aa_2way_should_block_pass_story           
+      ]}].
 
 suite() ->
     escalus:suite().
@@ -59,11 +68,11 @@ end_per_testcase(CaseName, Config) ->
 
 ensure_dependency()->
     Apps = [
-	    inets,
-	    crypto, 
-            public_key,
-            ssl,
-	    restc, 
+	    	inets,
+	    	crypto, 
+        	public_key,
+        	ssl,
+	    	restc, 
             ets ],
     app_util:start_apps(Apps),    
     ok.
@@ -74,6 +83,22 @@ ensure_dependency()->
 %% Message tests
 %%--------------------------------------------------------------------
 
+
+aa2aa_2way_should_pass_story(Config) ->
+    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+
+        %% AllAccess Send to NonSub
+        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
+
+        %% Bob gets the message
+        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
+                       escalus:wait_for_stanza(Bob))
+
+    end).
+
+
+
+aa2sub_2way_should_pass_story(Config) ->
 messages_story(Config) ->
     escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
 
@@ -85,3 +110,90 @@ messages_story(Config) ->
                        escalus:wait_for_stanza(Bob))
 
     end).
+
+
+
+aa2nonsub_2way_should_pass_story(Config) ->
+messages_story(Config) ->
+    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+
+        %% AllAccess Send to NonSub
+        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
+
+        %% Bob gets the message
+        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
+                       escalus:wait_for_stanza(Bob))
+
+    end).
+
+
+sub2sub_2way_should_pass_story(Config) ->
+messages_story(Config) ->
+    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+
+        %% AllAccess Send to NonSub
+        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
+
+        %% Bob gets the message
+        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
+                       escalus:wait_for_stanza(Bob))
+
+    end).
+
+
+sub2nonsub_2way_should_block_pass_story(Config) ->
+messages_story(Config) ->
+    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+
+        %% AllAccess Send to NonSub
+        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
+
+        %% Bob gets the message
+        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
+                       escalus:wait_for_stanza(Bob))
+
+    end).
+
+
+nonsub2non_2way_should_block_pass_story(Config) ->
+messages_story(Config) ->
+    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+
+        %% AllAccess Send to NonSub
+        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
+
+        %% Bob gets the message
+        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
+                       escalus:wait_for_stanza(Bob))
+
+    end).
+
+
+nonsub2sub_2way_should_block_pass_story(Config) ->
+messages_story(Config) ->
+    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+
+        %% AllAccess Send to NonSub
+        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
+
+        %% Bob gets the message
+        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
+                       escalus:wait_for_stanza(Bob))
+
+    end).
+
+
+nonsub2aa_2way_should_block_pass_story(Config) ->           
+messages_story(Config) ->
+    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+
+        %% AllAccess Send to NonSub
+        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
+
+        %% Bob gets the message
+        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
+                       escalus:wait_for_stanza(Bob))
+
+    end).
+
+
