@@ -87,141 +87,151 @@ aa2aa_2way_should_pass_story(Config) ->
     escalus:story(Config, 
     [{allaccess, 1},{allaccess2, 1}], 
     
-    fun(AllAccess, NonSub) ->
+    fun(AllAccess1, AllAccess2) ->
+    	Msg = timestamp_as_msg("AA1 to AA2"),
+        escalus:send(AllAccess1,
+        	 escalus_stanza:chat_to(AllAccess2, Msg)),
 
-        %% AllAccess Send to NonSub
-        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
-
-        %% Bob gets the message
-        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
-                       escalus:wait_for_stanza(Bob))
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(AllAccess2))
 
     end).
 
 
 
 aa2sub_2way_should_pass_story(Config) ->
-messages_story(Config) ->
     escalus:story(Config,
     [{allaccess1, 1},{subscribed1, 1}], 
     
-    fun(AllAccess, NonSub) ->
+    fun(AllAccess, Sub) ->
+    	Msg = timestamp_as_msg("AA1 to Sub"),
+       
+        escalus:send(AllAccess, 
+        	escalus_stanza:chat_to(Sub, Msg)),
 
-        %% AllAccess Send to NonSub
-        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
-
-        %% Bob gets the message
-        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
-                       escalus:wait_for_stanza(Bob))
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(Sub))
 
     end).
 
 
 
 aa2nonsub_2way_should_pass_story(Config) ->
-messages_story(Config) ->
+
     escalus:story(Config, 
     [{allaccess1, 1},{notsubscribed1, 1}], 
     fun(AllAccess, NonSub) ->
+    	Msg = timestamp_as_msg("AA1 to NonSub"),
 
-        %% AllAccess Send to NonSub
-        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
+        escalus:send(AllAccess,
+        	 escalus_stanza:chat_to(NonSub, Msg)),
 
-        %% Bob gets the message
-        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
-                       escalus:wait_for_stanza(Bob))
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(NonSub))
 
     end).
 
 
 sub2sub_2way_should_pass_story(Config) ->
-messages_story(Config) ->
+
     escalus:story(Config,
     
     [{subscribed1, 1},{subscribed2, 1}], 
     
-    fun(AllAccess, NonSub) ->
+    fun(Sub1, Sub2) ->
+  	 	Msg = timestamp_as_msg("Sub1 to Sub2"),
 
-        %% AllAccess Send to NonSub
-        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
+        
+        escalus:send(Sub1, 
+        	escalus_stanza:chat_to(Sub2, Msg)),
 
-        %% Bob gets the message
-        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
-                       escalus:wait_for_stanza(Bob))
+  
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(Sub2))
 
     end).
 
 
 sub2nonsub_2way_should_block_pass_story(Config) ->
-messages_story(Config) ->
+
     escalus:story(Config, 
     
     [{subscribed1, 1},{nonsubscribed1, 1}], 
     
-    fun(AllAccess, NonSub) ->
+    fun(Sub1, NonSub1) ->
 
-        %% AllAccess Send to NonSub
-        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
+  	 	Msg = timestamp_as_msg("Sub1 to NonSub1"),
+    
+        escalus:send(Sub1, escalus_stanza:chat_to(NonSub1, Msg)),
 
-        %% Bob gets the message
-        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
-                       escalus:wait_for_stanza(Bob))
+  
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(NonSub1))
 
     end).
 
 
 nonsub2non_2way_should_block_pass_story(Config) ->
-messages_story(Config) ->
+
     escalus:story(Config,
      
        [{nonsubscribed1, 1},{nonsubscribed2, 1}], 
        
-       fun(AllAccess, NonSub) ->
+       fun(NonSub1, NonSub2) ->
 
-        %% AllAccess Send to NonSub
-        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
-
-        %% Bob gets the message
-        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
-                       escalus:wait_for_stanza(Bob))
+  	 	Msg = timestamp_as_msg("NonSub1 to NonSub2"),
+        
+        escalus:send(NonSub1, escalus_stanza:chat_to(NonSub2, Msg)),
+  
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(NonSub2))
 
     end).
 
 
 nonsub2sub_2way_should_block_pass_story(Config) ->
-messages_story(Config) ->
+
     escalus:story(Config,
        
        [{nonsubscribed1, 1},{subscribed1, 1}], 
        
        
-        fun(AllAccess, NonSub) ->
+        fun(NonSub1, Sub1) ->
+  	 	Msg = timestamp_as_msg("NonSub1 to Sub1"),        
         
-        %% AllAccess Send to NonSub
-        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
+        escalus:send(NonSub1, escalus_stanza:chat_to(Sub1, Msg)),
 
-        %% Bob gets the message
-        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
-                       escalus:wait_for_stanza(Bob))
+  
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(Sub1))
 
     end).
 
 
 nonsub2aa_2way_should_block_pass_story(Config) ->           
-messages_story(Config) ->
+
     escalus:story(Config,
                   
        [{nonsubscribed1, 1},{allaccess1, 1}], 
               
-       fun(AllAccess, NonSub) ->
+       fun(NonSub1, AA1) ->
 
-        %% AllAccess Send to NonSub
-        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
+   	 	Msg = timestamp_as_msg("NonSub1 to AA1"),              
+        escalus:send(NonSub1, escalus_stanza:chat_to(AA1, Msg)),
 
-        %% Bob gets the message
-        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
-                       escalus:wait_for_stanza(Bob))
+  
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(AA1))
 
     end).
 
+iso_8601_fmt(DateTime)->
+   {{Year, Month, Day}, {Hour, Min, Sec}} = DateTime,
+   io_lib:format("~4.10.0B-~2.10.0B-~2.10.0B ~2.10.0B:~2.10.B:~2.10.0B",
+   	[Year, Month, Day, Hour, Min, Sec]).
 
+timestamp_as_msg(Seed)->
+   DateTime = erlang:localtime(),
+   Str = iso_8601_fmt(DateTime),
+   <<Str/binary,Seed/binary>>.
+  
