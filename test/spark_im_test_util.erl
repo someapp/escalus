@@ -10,6 +10,7 @@ create_password(Config)->
   Url = access_token_urls(Config),
   BrandId = lookup_brandid(Jid),
   Email = escalus_config:get_config(email, Config),
+  AppId = escalus_config:get_config(app_id, Config),
   Password = escalus_config:get_config(login_password, Config),
   ClientSecret = escalus_config:get_config(client_secret, Config),
   get_access_token_url_for(Jid, 
