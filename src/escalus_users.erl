@@ -169,9 +169,10 @@ get_user_by_name(Name) ->
 
 create_user(Config, {_Name, UserSpec}) ->
     Options0 = get_options(Config, UserSpec),  
-    io:format("Config ~s~n",[Config]),
-    io:format("UserSpec ~s~n",[UserSpec]),
-       
+
+    io_lib:format("UserSpec ~s~n",[lists:flatten(UserSpec)]),
+    io_lib:format("Options0 ~s~n",[lists:flatten(Options0)]),   
+  
     {ok, Conn, Options1} = escalus_connection:connect(Options0),
     escalus_session:start_stream(Conn, Options1),
     escalus_connection:send(Conn, escalus_stanza:get_registration_fields()),
