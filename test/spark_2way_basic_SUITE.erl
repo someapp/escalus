@@ -84,7 +84,10 @@ ensure_dependency()->
 
 
 aa2aa_2way_should_pass_story(Config) ->
-    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+    escalus:story(Config, 
+    [{allaccess, 1},{allaccess2, 1}], 
+    
+    fun(AllAccess, NonSub) ->
 
         %% AllAccess Send to NonSub
         escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
@@ -99,7 +102,10 @@ aa2aa_2way_should_pass_story(Config) ->
 
 aa2sub_2way_should_pass_story(Config) ->
 messages_story(Config) ->
-    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+    escalus:story(Config,
+    [{allaccess1, 1},{subscribed1, 1}], 
+    
+    fun(AllAccess, NonSub) ->
 
         %% AllAccess Send to NonSub
         escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
@@ -114,7 +120,9 @@ messages_story(Config) ->
 
 aa2nonsub_2way_should_pass_story(Config) ->
 messages_story(Config) ->
-    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+    escalus:story(Config, 
+    [{allaccess1, 1},{notsubscribed1, 1}], 
+    fun(AllAccess, NonSub) ->
 
         %% AllAccess Send to NonSub
         escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
@@ -128,7 +136,11 @@ messages_story(Config) ->
 
 sub2sub_2way_should_pass_story(Config) ->
 messages_story(Config) ->
-    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+    escalus:story(Config,
+    
+    [{subscribed1, 1},{subscribed2, 1}], 
+    
+    fun(AllAccess, NonSub) ->
 
         %% AllAccess Send to NonSub
         escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
@@ -142,7 +154,11 @@ messages_story(Config) ->
 
 sub2nonsub_2way_should_block_pass_story(Config) ->
 messages_story(Config) ->
-    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+    escalus:story(Config, 
+    
+    [{subscribed1, 1},{nonsubscribed1, 1}], 
+    
+    fun(AllAccess, NonSub) ->
 
         %% AllAccess Send to NonSub
         escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
@@ -156,7 +172,11 @@ messages_story(Config) ->
 
 nonsub2non_2way_should_block_pass_story(Config) ->
 messages_story(Config) ->
-    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+    escalus:story(Config,
+     
+       [{nonsubscribed1, 1},{nonsubscribed2, 1}], 
+       
+       fun(AllAccess, NonSub) ->
 
         %% AllAccess Send to NonSub
         escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
@@ -170,7 +190,12 @@ messages_story(Config) ->
 
 nonsub2sub_2way_should_block_pass_story(Config) ->
 messages_story(Config) ->
-    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+    escalus:story(Config,
+       
+       [{nonsubscribed1, 1},{subscribed1, 1}], 
+       
+       
+        fun(AllAccess, NonSub) ->
         
         %% AllAccess Send to NonSub
         escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
@@ -184,7 +209,11 @@ messages_story(Config) ->
 
 nonsub2aa_2way_should_block_pass_story(Config) ->           
 messages_story(Config) ->
-    escalus:story(Config, [1, 1], fun(AllAccess, NonSub) ->
+    escalus:story(Config,
+                  
+       [{nonsubscribed1, 1},{allaccess1, 1}], 
+              
+       fun(AllAccess, NonSub) ->
 
         %% AllAccess Send to NonSub
         escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
