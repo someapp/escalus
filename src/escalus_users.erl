@@ -19,10 +19,11 @@
 % Public API
 -export([create_users/1,
          create_users/2,
+       
          delete_users/1,
          delete_users/2,
          get_jid/2,
-         get_username/2,
+         get_username/2, 
          get_host/2,
          get_server/2,
          get_userspec/2,
@@ -56,6 +57,12 @@
 create_users(Config) ->
     create_users(Config, all).
 
+create_users(Config, {module, CustomModule}) 
+		when is_atom(CustomModule)->
+		
+		
+	create_users(Config, {module, CustomModule});
+
 create_users(Config, Who) ->
     Users = get_users(Who),
     CreationResults = [create_user(Config, User) || User <- Users],
@@ -83,8 +90,15 @@ get_username(Config, User) ->
     get_defined_option(Config, User, username, escalus_username).
 
 get_password(Config, User) ->
-    get_defined_option(Config, User, password, escalus_password).
-
+    case get_defined_option(Config,
+    						User, 
+    						password, 
+    						escalus_password) of
+    	 {module, Mod} -> {ok, Password} 
+    	 					= Mod:create_password(Config),
+    	 				  Password;
+    	 Else -> Else
+	end.
 get_host(Config, User) ->
     get_user_option(host, User, escalus_host, Config, <<"localhost">>).
 

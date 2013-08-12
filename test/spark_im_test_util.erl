@@ -5,6 +5,21 @@
 -include_lib("escalus/include/escalus.hrl").
 -include_lib("common_test/include/ct.hrl").
 
+create_password(Config)->
+  Jid = escalus_config:get_config(username, Config),
+  Url = access_token_urls(Config),
+  BrandId = lookup_brandid(Jid),
+  Email = escalus_config:get_config(email, Config),
+  Password = escalus_config:get_config(login_password, Config),
+  ClientSecret = escalus_config:get_config(client_secret, Config),
+  get_access_token_url_for(Jid, 
+			 Url,
+ 			 AppId,
+			 BrandId,
+			 Email,
+			 Password,
+			 ClientSecret).
+
 access_token_urls(Config)->
   BaseUrl = escalus_config:get_config(spark_api_endpoint, Config),   
   AccessTokenUrl = 
