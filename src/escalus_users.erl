@@ -57,14 +57,10 @@
 create_users(Config) ->
     create_users(Config, all).
 
-create_users(Config, {module, CustomModule}) 
-		when is_atom(CustomModule)->
-		
-		
-	create_users(Config, {module, CustomModule});
-
 create_users(Config, Who) ->
     Users = get_users(Who),
+    
+    
     CreationResults = [create_user(Config, User) || User <- Users],
     lists:foreach(fun verify_creation/1, CreationResults),
     [{escalus_users, Users}] ++ Config.
