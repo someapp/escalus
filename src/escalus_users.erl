@@ -168,20 +168,34 @@ get_user_by_name(Name) ->
     get_user_by_name(Name, get_users(all)).
 
 create_user(Config, {_Name, UserSpec}) ->
+	create_user(Config, {_Name, UserSpec}, false).
+
+create_user(Config, {_Name, UserSpec}, ShouldRegister) ->
     Options0 = get_options(Config, UserSpec),  
 
-    io_lib:format("UserSpec ~s~n",[lists:flatten(UserSpec)]),
-    io_lib:format("Options0 ~s~n",[lists:flatten(Options0)]),   
-  
-    {ok, Conn, Options1} = escalus_connection:connect(Options0),
-    escalus_session:start_stream(Conn, Options1),
-    escalus_connection:send(Conn, escalus_stanza:get_registration_fields()),
-    {ok, result, RegisterInstrs} = wait_for_result(Conn),
-    Answers = get_answers(Options1, RegisterInstrs),
-    escalus_connection:send(Conn, escalus_stanza:register_account(Answers)),
-    Result = wait_for_result(Conn),
+%    io_lib:format("Options0 ~s~n",[lists:flatten(Options0)]),  
+    
+    {ok, Conn, Options1} = escalus_connection:connect(Options0), 
+ 
+    print_connection_opts(Options1),
+
+    Ret = escalus_session:start_stream(Conn, Options1),
+    
+    ct:log("Xmpp Session ~w ~n", [Ret]),
+
+    Result = should_Register_User(ShouldRegister, Conn, Options1),
+    
     escalus_connection:stop(Conn),
     Result.
+
+should_Register_User(true, Conn, Options1)->
+    escalus_connection:send(Conn, escalus_stanza:get_registration_fields()),
+    {ok, result, RegisterInstrs} = wait_for_result(Conn),   
+    Answers = get_answers(Options1, RegisterInstrs),
+    escalus_connection:send(Conn, escalus_stanza:register_account(Answers)),
+    Result = wait_for_result(Conn);
+should_Register_User(_,_,_)-> ok.
+
 
 verify_creation({ok, result, _}) ->
     ok;
@@ -293,3 +307,29 @@ get_answers(UserSpec, InstrStanza) ->
     NoInstr = ChildrenNames -- [<<"instructions">>],
     [#xmlel{name=K, children=[exml:escape_cdata(proplists:get_value(K, BinSpec))]}
      || K <- NoInstr].
+     
+print_connection_opts(Opts)->
+  [{username,UserName},              
+   {server,Server},
+   {host,Host},
+   {port,Port},
+   {auth,Auth},
+   {wspath,WsPath},
+   {username,UserName},              
+   {server,Server},
+   {transport,Transport},
+   {email,Email},
+   {login_password, LoginPassword},
+   {password, PasswordGenerateModule}] = Opts,
+   
+   ct:log("UserName: ~s~n",[UserName]),
+   ct:log("Server: ~s~n",[Server]),
+   ct:log("Host: ~s~n",[Host]),
+   ct:log("Port: ~s~n",[atom_to_list(Port)]),
+   ct:log("Auth Method: ~s~n",[Auth]),
+   ct:log("WsPath: ~s~n",[WsPath]),
+   ct:log("Transport: ~s~n",[atom_to_list(Transport)]),
+   ct:log("Email: ~s~n",[Email]),
+   ct:log("Static Login Password: ~s~n",[LoginPassword]),
+   ct:log("Generate Password Module: ~s~n",[PasswordGenerateModule]).
+
