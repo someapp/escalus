@@ -189,6 +189,7 @@ create_user(Config, {_Name, UserSpec}, ShouldRegister) ->
     Result.
 
 should_Register_User(true, Conn, Options1)->
+    ct:log("Register new user: ~w ~n", [true]),
     escalus_connection:send(Conn, escalus_stanza:get_registration_fields()),
     {ok, result, RegisterInstrs} = wait_for_result(Conn),   
     Answers = get_answers(Options1, RegisterInstrs),
@@ -309,19 +310,28 @@ get_answers(UserSpec, InstrStanza) ->
      || K <- NoInstr].
      
 print_connection_opts(Opts)->
-  [{username,UserName},              
+  UserName = 
+  	proplists:get_value(username,Opts),
+  Server =
+    proplists:get_value(server, Opts),
+  Host =
+    proplists:get_value(host,Opts),
+  Transport =
+    proplists:get_value(transport,Opts), 
+  Port = 
+    proplists:get_value( port,Opts),
+  Auth =
+    proplists:get_value(auth,Opts),
+  WsPath =
+    proplists:get_value(wspath,Opts),
+  Email =
+    proplists:get_value(email,Opts),   
+  LoginPassword =
+    proplists:get_value(login_password, Opts),     
+  PasswordGenerateModule =
+    proplists:get_value(password, Opts),             
    {server,Server},
-   {host,Host},
-   {port,Port},
-   {auth,Auth},
-   {wspath,WsPath},
-   {username,UserName},              
-   {server,Server},
-   {transport,Transport},
-   {email,Email},
-   {login_password, LoginPassword},
-   {password, PasswordGenerateModule}] = Opts,
-   
+
    ct:log("UserName: ~s~n",[UserName]),
    ct:log("Server: ~s~n",[Server]),
    ct:log("Host: ~s~n",[Host]),
