@@ -325,10 +325,10 @@ print_connection_opts(Opts)->
    ct:log("UserName: ~s~n",[UserName]),
    ct:log("Server: ~s~n",[Server]),
    ct:log("Host: ~s~n",[Host]),
-   ct:log("Port: ~s~n",[atom_to_list(Port)]),
-   ct:log("Auth Method: ~s~n",[Auth]),
+   ct:log("Port: ~p~n",[Port]),
+   ct:log("Auth Method: ~p~n",[Auth]),
    ct:log("WsPath: ~s~n",[WsPath]),
-   ct:log("Transport: ~s~n",[atom_to_list(Transport)]),
+   ct:log("Transport: ~p~n",[Transport]),
    ct:log("Email: ~s~n",[Email]),
    ct:log("Static Login Password: ~s~n",[LoginPassword]),
    ct:log("Generate Password Module: ~s~n",[PasswordGenerateModule]).
