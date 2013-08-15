@@ -48,6 +48,7 @@
          count_roster_items/2,
          roster_contains/2,
          is_error/3,
+         is_stream_error/3,
          is_privacy_set/1,
          has_type/2,
          is_privacy_result/1,
@@ -62,13 +63,15 @@
          has_item/2,
          has_no_such_item/2,
          has_identity/3,
-         stanza_timeout/1
+         stanza_timeout/1,
+         is_stream_end/1,
+         is_bosh_report/2
      ]).
 
 -include("include/escalus.hrl").
 -include("escalus_xmlns.hrl").
 -include("escalus_deprecated.hrl").
--include_lib("exml/include/exml.hrl").
+-include_lib("exml/include/exml_stream.hrl").
 
 -import(escalus_compat, [bin/1]).
 
@@ -84,24 +87,24 @@
 %% Public API
 %%--------------------------------------------------------------------
 
-is_presence(#xmlelement{name = <<"presence">>}) ->
+is_presence(#xmlel{name = <<"presence">>}) ->
     true;
 is_presence(_) ->
     false.
 
 is_presence_with_type(<<"available">>, Pres) ->
-    is_presence_with_type(Pres, undefined);
+    is_presence_with_type(undefined, Pres);
 is_presence_with_type(Type, Pres) ->
     is_presence(Pres)
     andalso
     has_type(Type, Pres).
 
-is_message(#xmlelement{name = <<"message">>}) ->
+is_message(#xmlel{name = <<"message">>}) ->
     true;
 is_message(_) ->
     false.
 
-is_iq(#xmlelement{name = <<"iq">>}) ->
+is_iq(#xmlel{name = <<"iq">>}) ->
     true;
 is_iq(_) ->
     false.
@@ -132,8 +135,10 @@ is_chat_message(Msg, Stanza) ->
     andalso
     bin(Msg) == exml_query:path(Stanza, [{element, <<"body">>}, cdata]).
 
+has_type(undefined, Stanza) ->
+    undefined == exml_query:attr(Stanza, <<"type">>);
 has_type(Type, Stanza) ->
-    bin(Type) == exml_query:attr(Stanza, <<"type">>).
+    bin(Type) == bin(exml_query:attr(Stanza, <<"type">>)).
 
 is_iq_set(Stanza) -> is_iq(<<"set">>, Stanza).
 is_iq_get(Stanza) -> is_iq(<<"get">>, Stanza).
@@ -181,7 +186,7 @@ is_private_error(Stanza) ->
 roster_contains(Contact, Stanza) ->
     ExpectedJid = escalus_utils:get_jid(Contact),
     Items = get_roster_items(Stanza),
-    lists:any(fun (#xmlelement{} = Element) ->
+    lists:any(fun (#xmlel{} = Element) ->
                       ContactJid = exml_query:attr(Element, <<"jid">>),
                       Pref = escalus_utils:is_prefix(ContactJid, ExpectedJid),
                       if %% TODO: simplify to `ContactJid == ExpectedJid`
@@ -208,6 +213,17 @@ is_error(Type, Condition, Stanza) ->
     andalso
     exml_query:path(Error, [{element, bin(Condition)},
                             {attr, <<"xmlns">>}]) == ?NS_STANZA_ERRORS.
+
+is_stream_error(Type, Text, Stanza) ->
+    Stanza#xmlel.name =:= <<"stream:error">>
+    andalso
+    exml_query:subelement(Stanza, Type) =/= undefined
+    andalso
+    case Text of
+        <<>> -> true;
+        _ -> [#xmlcdata{content = Text}]
+             =:= (exml_query:subelement(Stanza, <<"text">>))#xmlel.children
+    end.
 
 is_privacy_set(Stanza) ->
     is_iq(<<"set">>, ?NS_PRIVACY, Stanza).
@@ -262,7 +278,7 @@ is_adhoc_response(Node, Status, Stanza) ->
         Status == exml_query:path(Stanza, [{element, <<"command">>},
                                            {attr, <<"status">>}]).
 
-has_service(Service, #xmlelement{children = [ #xmlelement{children = Services} ]}) ->
+has_service(Service, #xmlel{children = [ #xmlel{children = Services} ]}) ->
     Pred = fun(Item) ->
                exml_query:attr(Item, <<"jid">>) =:= Service
            end,
@@ -309,6 +325,18 @@ stanza_timeout(Arg) ->
             false
     end.
 
+is_stream_end(#xmlstreamend{}) ->
+    true;
+is_stream_end(_) ->
+    false.
+
+is_bosh_report(Rid, #xmlel{name = <<"body">>} = Body) ->
+    Rid == list_to_integer(binary_to_list(exml_query:attr(Body, <<"report">>)))
+    andalso
+    exml_query:attr(Body, <<"time">>) /= undefined;
+is_bosh_report(_, _) ->
+    false.
+
 %%--------------------------------------------------------------------
 %% Helpers
 %%--------------------------------------------------------------------
@@ -316,7 +344,7 @@ stanza_timeout(Arg) ->
 get_roster_items(Stanza) ->
     escalus:assert(is_iq_with_ns, [?NS_ROSTER], Stanza),
     Query = exml_query:subelement(Stanza, <<"query">>),
-    Query#xmlelement.children.
+    Query#xmlel.children.
 
 has_path(Stanza, Path) ->
     exml_query:path(Stanza, Path) /= undefined.

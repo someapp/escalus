@@ -7,6 +7,7 @@
 
 %% Public APi
 -export([auth_plain/2,
+		 auth_plain/3,
          auth_digest_md5/2,
          auth_sasl_anon/2,
          auth_sasl_external/2]).
@@ -22,12 +23,18 @@
 %%--------------------------------------------------------------------
 
 auth_plain(Conn, Props) ->
-    Username = get_property(username, Props),
     Password = get_property(password, Props),
+    auth_plain(Conn, Password, Props).
+       
+auth_plain(Conn, Pwd, Props) ->
+    Username = get_property(username, Props),
+    %Password = get_property(password, Props),
+ 	Password = Pwd,
     Payload = <<0:8,Username/binary,0:8,Password/binary>>,
     Stanza = escalus_stanza:auth_stanza(<<"PLAIN">>, base64_cdata(Payload)),
     ok = escalus_connection:send(Conn, Stanza),
-    wait_for_success(Username, Conn).
+    wait_for_success(Username, Conn).    
+    
 
 auth_digest_md5(Conn, Props) ->
     ok = escalus_connection:send(Conn, escalus_stanza:auth_stanza(<<"DIGEST-MD5">>, [])),
@@ -104,7 +111,7 @@ hex_md5(Data) ->
 get_challenge(Conn, Descr) ->
     Challenge = escalus_connection:get_stanza(Conn, Descr),
     case Challenge of
-        #xmlelement{name = <<"challenge">>, children=[CData]} ->
+        #xmlel{name = <<"challenge">>, children=[CData]} ->
             csvkv:parse(base64:decode(exml:unescape_cdata(CData)));
         _ ->
             throw({expected_challenge, got, Challenge})
@@ -112,7 +119,7 @@ get_challenge(Conn, Descr) ->
 
 wait_for_success(Username, Conn) ->
     AuthReply = escalus_connection:get_stanza(Conn, auth_reply),
-    case AuthReply#xmlelement.name of
+    case AuthReply#xmlel.name of
         <<"success">> ->
             ok;
         <<"failure">> ->

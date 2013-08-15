@@ -1,12 +1,13 @@
 {application, escalus,
  [
   {description, ""},
-  {vsn, "1"},
+  {vsn, git},
   {registered, []},
   {applications, [
                   kernel,
                   stdlib
                  ]},
+  
   {mod, { escalus_app, []}},
   {env, []}
  ]}.
