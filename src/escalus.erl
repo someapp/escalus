@@ -22,6 +22,10 @@
          end_per_suite/1,
          init_per_testcase/2,
          end_per_testcase/2,
+         login_users/1,
+         login_users/2,
+         logout_users/1,
+         logout_users/2,         
          create_users/1,
          create_users/2,
          delete_users/1,
@@ -72,6 +76,11 @@ end_per_testcase(_CaseName, Config) ->
 ?FORWARD2(escalus_users, create_users).
 ?FORWARD1(escalus_users, delete_users).
 ?FORWARD2(escalus_users, delete_users).
+
+?FORWARD1(escalus_spark_users, login_users).
+?FORWARD2(escalus_spark_users, login_users).
+?FORWARD1(escalus_spark_users, logout_users).
+?FORWARDs(escalus_spark_users, logout_users). 
 
 ?FORWARD1(escalus_story, make_everyone_friends).
 ?FORWARD3(escalus_story, story).
