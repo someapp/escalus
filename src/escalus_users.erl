@@ -19,10 +19,11 @@
 % Public API
 -export([create_users/1,
          create_users/2,
+       
          delete_users/1,
          delete_users/2,
          get_jid/2,
-         get_username/2,
+         get_username/2, 
          get_host/2,
          get_server/2,
          get_userspec/2,
@@ -57,7 +58,11 @@ create_users(Config) ->
     create_users(Config, all).
 
 create_users(Config, Who) ->
+    error_logger:info_msg("Create Users: ~p ~n",[Who]),
+    
     Users = get_users(Who),
+   
+    
     CreationResults = [create_user(Config, User) || User <- Users],
     lists:foreach(fun verify_creation/1, CreationResults),
     [{escalus_users, Users}] ++ Config.
@@ -83,8 +88,15 @@ get_username(Config, User) ->
     get_defined_option(Config, User, username, escalus_username).
 
 get_password(Config, User) ->
-    get_defined_option(Config, User, password, escalus_password).
-
+    case get_defined_option(Config,
+    						User, 
+    						password, 
+    						escalus_password) of
+    	 {module, Mod} -> {ok, Password} 
+    	 					= Mod:create_password(Config),
+    	 				  Password;
+    	 Else -> Else
+	end.
 get_host(Config, User) ->
     get_user_option(host, User, escalus_host, Config, <<"localhost">>).
 
@@ -156,16 +168,35 @@ get_user_by_name(Name) ->
     get_user_by_name(Name, get_users(all)).
 
 create_user(Config, {_Name, UserSpec}) ->
-    Options0 = get_options(Config, UserSpec),
-    {ok, Conn, Options1} = escalus_connection:connect(Options0),
-    escalus_session:start_stream(Conn, Options1),
-    escalus_connection:send(Conn, escalus_stanza:get_registration_fields()),
-    {ok, result, RegisterInstrs} = wait_for_result(Conn),
-    Answers = get_answers(Options1, RegisterInstrs),
-    escalus_connection:send(Conn, escalus_stanza:register_account(Answers)),
-    Result = wait_for_result(Conn),
+	create_user(Config, {_Name, UserSpec}, false).
+
+create_user(Config, {_Name, UserSpec}, ShouldRegister) ->
+    Options0 = get_options(Config, UserSpec),  
+
+%    io_lib:format("Options0 ~s~n",[lists:flatten(Options0)]),  
+    
+    {ok, Conn, Options1} = escalus_connection:connect(Options0), 
+ 
+    print_connection_opts(Options1),
+
+    Ret = escalus_session:start_stream(Conn, Options1),
+    
+    ct:log("Xmpp Session ~w ~n", [Ret]),
+
+    Result = should_Register_User(ShouldRegister, Conn, Options1),
+    
     escalus_connection:stop(Conn),
     Result.
+
+should_Register_User(true, Conn, Options1)->
+    ct:log("Register new user: ~w ~n", [true]),
+    escalus_connection:send(Conn, escalus_stanza:get_registration_fields()),
+    {ok, result, RegisterInstrs} = wait_for_result(Conn),   
+    Answers = get_answers(Options1, RegisterInstrs),
+    escalus_connection:send(Conn, escalus_stanza:register_account(Answers)),
+    Result = wait_for_result(Conn);
+should_Register_User(_,_,_)-> ok.
+
 
 verify_creation({ok, result, _}) ->
     ok;
@@ -277,3 +308,38 @@ get_answers(UserSpec, InstrStanza) ->
     NoInstr = ChildrenNames -- [<<"instructions">>],
     [#xmlel{name=K, children=[exml:escape_cdata(proplists:get_value(K, BinSpec))]}
      || K <- NoInstr].
+     
+print_connection_opts(Opts)->
+  UserName = 
+  	proplists:get_value(username,Opts),
+  Server =
+    proplists:get_value(server, Opts),
+  Host =
+    proplists:get_value(host,Opts),
+  Transport =
+    proplists:get_value(transport,Opts), 
+  Port = 
+    proplists:get_value( port,Opts),
+  Auth =
+    proplists:get_value(auth,Opts),
+  WsPath =
+    proplists:get_value(wspath,Opts),
+  Email =
+    proplists:get_value(email,Opts),   
+  LoginPassword =
+    proplists:get_value(login_password, Opts),     
+  PasswordGenerateModule =
+    proplists:get_value(password, Opts),             
+   {server,Server},
+
+   ct:log("UserName: ~s~n",[UserName]),
+   ct:log("Server: ~s~n",[Server]),
+   ct:log("Host: ~s~n",[Host]),
+   ct:log("Port: ~p~n",[Port]),
+   ct:log("Auth Method: ~p~n",[Auth]),
+   ct:log("WsPath: ~s~n",[WsPath]),
+   ct:log("Transport: ~p~n",[Transport]),
+   ct:log("Email: ~s~n",[Email]),
+   ct:log("Static Login Password: ~s~n",[LoginPassword]),
+   ct:log("Generate Password Module: ~s~n",[PasswordGenerateModule]).
+

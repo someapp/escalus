@@ -28,7 +28,16 @@ all() ->
     [{group, messages}].
 
 groups() ->
-    [{messages, [sequence], [messages_story]}].
+    [{messages, [sequence], 
+     [aa2aa_2way_should_pass_story,
+      aa2sub_2way_should_pass_story,
+      aa2nonsub_2way_should_pass_story,
+      sub2sub_2way_should_pass_story,
+      sub2nonsub_2way_should_block_pass_story,
+      nonsub2non_2way_should_block_pass_story,
+      nonsub2sub_2way_should_block_pass_story,
+      nonsub2aa_2way_should_block_pass_story           
+      ]}].
 
 suite() ->
     escalus:suite().
@@ -38,32 +47,38 @@ suite() ->
 %%--------------------------------------------------------------------
 
 init_per_suite(Config) ->
+	error_logger:info_msg("Init Test Suite with Config ~p~n",[Config]),
     escalus:init_per_suite(Config).
 
 end_per_suite(Config) ->
+	error_logger:info_msg("End Test Suite with Config ~p~n",[Config]),
     escalus:end_per_suite(Config).
 
-init_per_group(_GroupName, Config) ->
+init_per_group(GroupName, Config) ->
+	error_logger:info_msg("Init Test Group ~p with Config ~p~n",[GroupName, Config]),
     escalus:create_users(Config).
 
-end_per_group(_GroupName, Config) ->
+end_per_group(GroupName, Config) ->
+	error_logger:info_msg("End Test Group ~p with Config ~p~n",[GroupName, Config]),
     escalus:delete_users(Config).
 
 init_per_testcase(CaseName, Config) ->
+	error_logger:info_msg("Init Test Case ~p with Config ~p~n",[CaseName, Config]),
     escalus:init_per_testcase(CaseName, Config).
 
 end_per_testcase(CaseName, Config) ->
+	error_logger:info_msg("End Test Case ~p with Config ~p~n",[CaseName, Config]),
     escalus:end_per_testcase(CaseName, Config).
 
 
 
 ensure_dependency()->
     Apps = [
-	    inets,
-	    crypto, 
-            public_key,
-            ssl,
-	    restc, 
+	    	inets,
+	    	crypto, 
+        	public_key,
+        	ssl,
+	    	restc, 
             ets ],
     app_util:start_apps(Apps),    
     ok.
@@ -74,14 +89,155 @@ ensure_dependency()->
 %% Message tests
 %%--------------------------------------------------------------------
 
-messages_story(Config) ->
-    escalus:story(Config, [1, 1], fun(Alice, Bob) ->
+aa2aa_2way_should_pass_story(Config) ->
+    escalus:story(Config, 
+    [{allaccess, 1},{allaccess2, 1}], 
+    
+    fun(AllAccess1, AllAccess2) ->
+    	Msg = timestamp_as_msg("AA1 to AA2"),
+        escalus:send(AllAccess1,
+        	 escalus_stanza:chat_to(AllAccess2, Msg)),
 
-        %% Alice sends a message to Bob
-        escalus:send(Alice, escalus_stanza:chat_to(Bob, <<"OH, HAI!">>)),
-
-        %% Bob gets the message
-        escalus:assert(is_chat_message, [<<"OH, HAI!">>],
-                       escalus:wait_for_stanza(Bob))
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(AllAccess2))
 
     end).
+
+
+
+aa2sub_2way_should_pass_story(Config) ->
+    escalus:story(Config,
+    [{allaccess1, 1},{subscribed1, 1}], 
+    
+    fun(AllAccess, Sub) ->
+    	Msg = timestamp_as_msg("AA1 to Sub"),
+       
+        escalus:send(AllAccess, 
+        	escalus_stanza:chat_to(Sub, Msg)),
+
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(Sub))
+
+    end).
+
+
+
+aa2nonsub_2way_should_pass_story(Config) ->
+
+    escalus:story(Config, 
+    [{allaccess1, 1},{notsubscribed1, 1}], 
+    fun(AllAccess, NonSub) ->
+    	Msg = timestamp_as_msg("AA1 to NonSub"),
+
+        escalus:send(AllAccess,
+        	 escalus_stanza:chat_to(NonSub, Msg)),
+
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(NonSub))
+
+    end).
+
+
+sub2sub_2way_should_pass_story(Config) ->
+
+    escalus:story(Config,
+    
+    [{subscribed1, 1},{subscribed2, 1}], 
+    
+    fun(Sub1, Sub2) ->
+  	 	Msg = timestamp_as_msg("Sub1 to Sub2"),
+
+        
+        escalus:send(Sub1, 
+        	escalus_stanza:chat_to(Sub2, Msg)),
+
+  
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(Sub2))
+
+    end).
+
+
+sub2nonsub_2way_should_block_pass_story(Config) ->
+
+    escalus:story(Config, 
+    
+    [{subscribed1, 1},{nonsubscribed1, 1}], 
+    
+    fun(Sub1, NonSub1) ->
+
+  	 	Msg = timestamp_as_msg("Sub1 to NonSub1"),
+    
+        escalus:send(Sub1, escalus_stanza:chat_to(NonSub1, Msg)),
+
+  
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(NonSub1))
+
+    end).
+
+
+nonsub2non_2way_should_block_pass_story(Config) ->
+
+    escalus:story(Config,
+     
+       [{nonsubscribed1, 1},{nonsubscribed2, 1}], 
+       
+       fun(NonSub1, NonSub2) ->
+
+  	 	Msg = timestamp_as_msg("NonSub1 to NonSub2"),
+        
+        escalus:send(NonSub1, escalus_stanza:chat_to(NonSub2, Msg)),
+  
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(NonSub2))
+
+    end).
+
+
+nonsub2sub_2way_should_block_pass_story(Config) ->
+
+    escalus:story(Config,
+       
+       [{nonsubscribed1, 1},{subscribed1, 1}], 
+       
+       
+        fun(NonSub1, Sub1) ->
+  	 	Msg = timestamp_as_msg("NonSub1 to Sub1"),        
+        
+        escalus:send(NonSub1, escalus_stanza:chat_to(Sub1, Msg)),
+
+  
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(Sub1))
+
+    end).
+
+
+nonsub2aa_2way_should_block_pass_story(Config) ->           
+
+    escalus:story(Config,
+                  
+       [{nonsubscribed1, 1},{allaccess1, 1}], 
+              
+       fun(NonSub1, AA1) ->
+
+   	 	Msg = timestamp_as_msg("NonSub1 to AA1"),              
+        escalus:send(NonSub1, escalus_stanza:chat_to(AA1, Msg)),
+
+  
+        escalus:assert(is_chat_message, [Msg],
+                       escalus:wait_for_stanza(AA1))
+
+    end).
+
+iso_8601_fmt(DateTime)->
+   {{Year, Month, Day}, {Hour, Min, Sec}} = DateTime,
+   io_lib:format("~4.10.0B-~2.10.0B-~2.10.0B ~2.10.0B:~2.10.B:~2.10.0B",
+   	[Year, Month, Day, Hour, Min, Sec]).
+
+timestamp_as_msg(Seed)->
+   DateTime = erlang:localtime(),
+   Str = iso_8601_fmt(DateTime),
+   <<Str/binary,Seed/binary>>.
+  
