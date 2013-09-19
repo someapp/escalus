@@ -58,11 +58,11 @@ end_per_suite(Config) ->
 
 init_per_group(GroupName, Config) ->
 	error_logger:info_msg("Init Test Group ~p with Config ~p~n",[GroupName, Config]),
-    escalus:create_users(Config).
+    escalus:init_per_group(Config).
 
 end_per_group(GroupName, Config) ->
 	error_logger:info_msg("End Test Group ~p with Config ~p~n",[GroupName, Config]),
-    escalus:delete_users(Config).
+    escalus:end_per_group(Config).
 
 init_per_testcase(CaseName, Config) ->
 	error_logger:info_msg("Init Test Case ~p with Config ~p~n",[CaseName, Config]),

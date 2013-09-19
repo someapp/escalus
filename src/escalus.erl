@@ -22,6 +22,8 @@
          end_per_suite/1,
          init_per_testcase/2,
          end_per_testcase/2,
+         init_per_group/1,
+         end_per_group/1,
          login_users/1,
          login_users/2,
          logout_users/1,
@@ -63,6 +65,14 @@ init_per_testcase(_CaseName, Config) ->
 
 end_per_testcase(_CaseName, Config) ->
     escalus_cleaner:stop(Config).
+
+init_per_group(Config) ->
+    application:start(exml),
+    Config.
+
+end_per_group(_Config) ->
+    ok.
+
 
 %%--------------------------------------------------------------------
 %% Public API - forward functions from other modules
