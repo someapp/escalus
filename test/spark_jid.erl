@@ -26,9 +26,7 @@ split_Jid(Jid) ->
 	 		 		error_logger:info_msg("Found MemberJid ~p, CommunityId ~p", [A,B]),		  
 	 		 		[A,B];
 	 		 E->E
-	    end;
-	 _ -> 
-	   Jid
+	    end
    end.
 
 
