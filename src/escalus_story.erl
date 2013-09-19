@@ -165,6 +165,7 @@ clients_from_resource_counts(Config, ResourceCounts) ->
     [ resources_per_spec(UserSpec, ResCount) ||
       {{_, UserSpec}, ResCount} <- zip_shortest(NamedSpecs,
                                                 ResourceCounts) ].
-
+resources_per_spec(UserSpec, -1) ->
+    [{UserSpec, <<"">>}];
 resources_per_spec(UserSpec, ResCount) ->
     [{UserSpec, list_to_binary("res"++integer_to_list(N))} || N <- lists:seq(1, ResCount)].

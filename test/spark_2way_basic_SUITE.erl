@@ -20,6 +20,8 @@
 -include_lib("escalus/include/escalus.hrl").
 -include_lib("common_test/include/ct.hrl").
 
+-define(NoResource, -1).
+
 %%--------------------------------------------------------------------
 %% Suite configuration
 %%--------------------------------------------------------------------
@@ -92,7 +94,9 @@ ensure_dependency()->
 %%--------------------------------------------------------------------
 user_login_story(Config)->
 	escalus:story(Config,
-	[{allaccess,1},{notsubscribed1, 1}, {subscribed1, 1}],
+	[{allaccess, ?NoResource},
+	 {notsubscribed1,?NoResource}, 
+	 {subscribed1, ?NoResource}],
 	fun(AllAccess1, NonSub1, Sub1)->
 		escalus:login_users(all)
 	end
