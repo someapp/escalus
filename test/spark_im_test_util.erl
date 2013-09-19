@@ -52,7 +52,7 @@ get_access_token_url_for(Jid,
 			 BrandId,
 			 Email,
 			 Password,
-			 ClientSecret) of  
+			 ClientSecret),  
        
   {ok, Token} = 
 	case restc:request(post, json, Url, [200], [],[""]) of

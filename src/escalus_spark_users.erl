@@ -14,13 +14,14 @@ login_users(Config, Who) ->
     	[login_user(Config, User) || User <- Users],
     lists:foreach(fun verify_login/1, LoginResults),
     [{escalus_users, Users}] ++ Config.
+    
 
 login_user(Config, {_Name, UserSpec}) ->
     Token = spark_im_test_util:create_password(Config),
     {ok, Conn, Props} = escalus_connection:start(Config),
     Props0 = update_field(Props, password, Token),
-    LoginResult = escalus_session:authenticate(Conn, Props0),    
-	LoginResult.    
+    LoginResult = escalus_session:authenticate(Conn, Props0).    
+	    
 	
 update_field([],_,_) -> [];
 update_field(Props, Key, Val) ->

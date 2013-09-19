@@ -30,15 +30,15 @@ all() ->
 groups() ->
     [{messages, [sequence], 
      [
-      user_login_story,
-      aa2aa_2way_should_pass_story,
-      aa2sub_2way_should_pass_story,
-      aa2nonsub_2way_should_pass_story,
-      sub2sub_2way_should_pass_story,
-      sub2nonsub_2way_should_block_pass_story,
-      nonsub2non_2way_should_block_pass_story,
-      nonsub2sub_2way_should_block_pass_story,
-      nonsub2aa_2way_should_block_pass_story           
+      user_login_story
+      ,aa2aa_2way_should_pass_story
+      ,aa2sub_2way_should_pass_story
+      ,aa2nonsub_2way_should_pass_story
+      ,sub2sub_2way_should_pass_story
+      ,sub2nonsub_2way_should_block_pass_story
+      ,nonsub2non_2way_should_block_pass_story
+      ,nonsub2sub_2way_should_block_pass_story
+      ,nonsub2aa_2way_should_block_pass_story           
       ]}].
 
 suite() ->
@@ -94,7 +94,7 @@ user_login_story(Config)->
 	escalus:story(Config,
 	[{allaccess,1},{notsubscribed1, 1}, {subscribed1, 1}],
 	fun(AllAccess1, NonSub1, Sub1)->
-		escalus:
+		escalus:login_users(all)
 	end
 	).
 
