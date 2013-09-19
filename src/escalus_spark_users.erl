@@ -14,6 +14,10 @@ login_users(Config, Who) ->
     	[login_user(Config, User) || User <- Users],
     lists:foreach(fun verify_login/1, LoginResults),
     [{escalus_users, Users}] ++ Config.
+
+login_user(Config, {_Name, UserSpec}) ->
+
+	ok.    
     
 logout_users(Config) ->
     logout_users(Config, all).
@@ -27,12 +31,12 @@ logout_users(Config, Who) ->
     end,
     [logout_user(Config, User) || User <- Users].
 
-login_user(Config, {_Name, UserSpec}) ->
-	
-
 verify_login({ok, result, _}) ->
-    ok;
-	
+
+    ok.
+
+
 
 logout_user(Config, {_Name, UserSpec}) ->
 	
+    ok.

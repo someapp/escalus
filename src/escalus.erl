@@ -80,7 +80,7 @@ end_per_testcase(_CaseName, Config) ->
 ?FORWARD1(escalus_spark_users, login_users).
 ?FORWARD2(escalus_spark_users, login_users).
 ?FORWARD1(escalus_spark_users, logout_users).
-?FORWARDs(escalus_spark_users, logout_users). 
+?FORWARD2(escalus_spark_users, logout_users). 
 
 ?FORWARD1(escalus_story, make_everyone_friends).
 ?FORWARD3(escalus_story, story).
