@@ -19,7 +19,7 @@
 % Public API
 -export([create_users/1,
          create_users/2,
-       
+         
          delete_users/1,
          delete_users/2,
          get_jid/2,
@@ -194,7 +194,8 @@ should_Register_User(true, Conn, Options1)->
     {ok, result, RegisterInstrs} = wait_for_result(Conn),   
     Answers = get_answers(Options1, RegisterInstrs),
     escalus_connection:send(Conn, escalus_stanza:register_account(Answers)),
-    Result = wait_for_result(Conn);
+    Result = wait_for_result(Conn), 
+    Result;
 should_Register_User(_,_,_)-> ok.
 
 
@@ -321,7 +322,7 @@ print_connection_opts(Opts)->
   Port = 
     proplists:get_value( port,Opts),
   Auth =
-    proplists:get_value(auth,Opts),
+    proplists:get_value(auth, Opts),
   WsPath =
     proplists:get_value(wspath,Opts),
   Email =
@@ -330,7 +331,7 @@ print_connection_opts(Opts)->
     proplists:get_value(login_password, Opts),     
   PasswordGenerateModule =
     proplists:get_value(password, Opts),             
-   {server,Server},
+   
 
    ct:log("UserName: ~s~n",[UserName]),
    ct:log("Server: ~s~n",[Server]),

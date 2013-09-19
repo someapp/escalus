@@ -29,7 +29,9 @@ all() ->
 
 groups() ->
     [{messages, [sequence], 
-     [aa2aa_2way_should_pass_story,
+     [
+      user_login_story,
+      aa2aa_2way_should_pass_story,
       aa2sub_2way_should_pass_story,
       aa2nonsub_2way_should_pass_story,
       sub2sub_2way_should_pass_story,
@@ -88,7 +90,15 @@ ensure_dependency()->
 %%--------------------------------------------------------------------
 %% Message tests
 %%--------------------------------------------------------------------
+user_login_story(Config)->
+	escalus:story(Config,
+	[{allaccess,1},{notsubscribed1, 1}, {subscribed1, 1}],
+	fun(AllAccess1, NonSub1, Sub1)->
+		escalus:
+	end
+	).
 
+    
 aa2aa_2way_should_pass_story(Config) ->
     escalus:story(Config, 
     [{allaccess, 1},{allaccess2, 1}], 
